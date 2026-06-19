@@ -15,7 +15,7 @@ const TODAY = () => new Date().toISOString().split('T')[0]
 const NOW_ISO = () => new Date().toISOString()
 
 export async function transcribeAudio(audioBuffer: Buffer, filename: string): Promise<string> {
-  const file = new File([audioBuffer], filename, { type: 'audio/webm' })
+  const file = new File([new Uint8Array(audioBuffer)], filename, { type: 'audio/webm' })
   const result = await openai.audio.transcriptions.create({
     model: 'whisper-1',
     file,
