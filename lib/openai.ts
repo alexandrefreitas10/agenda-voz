@@ -1,6 +1,8 @@
 import OpenAI from 'openai'
 
-export const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+function getClient() {
+  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+}
 
 export interface ParsedItem {
   type: 'appointment' | 'task'
@@ -16,7 +18,7 @@ const NOW_ISO = () => new Date().toISOString()
 
 export async function transcribeAudio(audioBuffer: Buffer, filename: string): Promise<string> {
   const file = new File([new Uint8Array(audioBuffer)], filename, { type: 'audio/webm' })
-  const result = await openai.audio.transcriptions.create({
+  const result = await getClient().audio.transcriptions.create({
     model: 'whisper-1',
     file,
     language: 'pt',
@@ -28,7 +30,7 @@ export async function parseTranscription(text: string): Promise<ParsedItem> {
   const today = TODAY()
   const nowIso = NOW_ISO()
 
-  const response = await openai.chat.completions.create({
+  const response = await getClient().chat.completions.create({
     model: 'gpt-4o-mini',
     response_format: { type: 'json_object' },
     messages: [

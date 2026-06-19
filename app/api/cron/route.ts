@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
 import sql, { initSchema } from '@/lib/db'
 import { sendPush } from '@/lib/push'

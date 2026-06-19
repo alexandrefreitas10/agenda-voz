@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
 import { transcribeAudio, parseTranscription } from '@/lib/openai'
 import sql, { initSchema } from '@/lib/db'
