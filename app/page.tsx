@@ -141,7 +141,7 @@ export default function HomePage() {
       {/* Header */}
       <div className="px-4 pt-8 pb-4 flex items-start justify-between">
         <div className="flex-1">
-          <p className="text-zinc-400 text-sm">{formatGreeting()}</p>
+          <p className="text-zinc-400 text-sm">{formatGreeting()} Alexandre</p>
           <h1 className="text-2xl font-black text-white">Minha Agenda</h1>
           <p className="text-zinc-500 text-xs mt-0.5">
             {new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })}
