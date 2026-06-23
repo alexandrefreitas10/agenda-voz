@@ -47,10 +47,17 @@ function formatAmount(v: string | number) {
   return Number(v).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 }
 
-const emptyForm = {
-  name: '', category: '', type: 'recurring' as const,
+type FormType = {
+  name: string; category: string; type: 'recurring' | 'installment' | 'single';
+  installment_current: string; installment_total: string;
+  amount: string; owner: 'mine' | 'wife' | 'shared'; auto_debit: boolean;
+  status: 'paid' | 'unpaid'; notes: string;
+}
+
+const emptyForm: FormType = {
+  name: '', category: '', type: 'recurring',
   installment_current: '', installment_total: '',
-  amount: '', owner: 'mine' as const, auto_debit: false, status: 'unpaid' as const, notes: ''
+  amount: '', owner: 'mine', auto_debit: false, status: 'unpaid', notes: ''
 }
 
 export default function FinancasPage() {
@@ -58,8 +65,8 @@ export default function FinancasPage() {
   const [expenses, setExpenses] = useState<Expense[]>([])
   const [loading, setLoading] = useState(true)
   const [showAdd, setShowAdd] = useState(false)
+  const [form, setForm] = useState<FormType>({ ...emptyForm })
   const [editingId, setEditingId] = useState<number | null>(null)
-  const [form, setForm] = useState({ ...emptyForm })
   const [copying, setCopying] = useState(false)
 
   const load = useCallback(async () => {
