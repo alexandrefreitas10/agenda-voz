@@ -10,6 +10,19 @@ self.addEventListener('activate', event => {
   event.waitUntil(clients.claim())
 })
 
+self.addEventListener('message', event => {
+  console.log('[SW] Message received:', event.data)
+  if (event.data?.type === 'SHOW_TEST_NOTIFICATION') {
+    self.registration.showNotification('✓ Notificações funcionando!', {
+      body: 'Sistema de lembretes está ativo',
+      tag: 'test-notification',
+      icon: '/icons/icon-192.png',
+      badge: '/icons/icon-192.png',
+      vibrate: [200, 100, 200],
+    })
+  }
+})
+
 self.addEventListener('push', event => {
   console.log('[SW] Push received')
   const data = event.data?.json() ?? {}
