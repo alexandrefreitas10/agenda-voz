@@ -37,12 +37,14 @@ export async function GET() {
         tag: `item-${item.id}`,
       })
       if (!ok) {
+        console.log('Invalid subscription, removing:', sub.endpoint)
         await sql`DELETE FROM push_subscriptions WHERE endpoint = ${sub.endpoint}`
       }
     }
     await sql`UPDATE items SET reminder_notified = true WHERE id = ${item.id}`
     sent++
+    console.log(`✓ Notified item ${item.id}: ${item.title}`)
   }
 
-  return NextResponse.json({ sent })
+  return NextResponse.json({ sent, timestamp: new Date().toISOString() })
 }
