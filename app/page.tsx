@@ -6,6 +6,7 @@ import Link from 'next/link'
 import MicButton from '@/components/MicButton'
 import ItemCard from '@/components/ItemCard'
 import AddItemModal from '@/components/AddItemModal'
+import { checkAndNotifyReminders } from '@/lib/reminders'
 
 interface Item {
   id: number
@@ -42,6 +43,9 @@ export default function HomePage() {
     const res = await fetch('/api/items')
     setItems(await res.json())
     setLoading(false)
+
+    // Verificar lembretes vencidos ao abrir a app
+    setTimeout(() => checkAndNotifyReminders(), 500)
   }, [])
 
   useEffect(() => { load() }, [load])
