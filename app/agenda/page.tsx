@@ -52,6 +52,10 @@ export default function AgendaPage() {
     setItems(prev => prev.map(i => i.id === id ? updated : i))
   }
 
+  function handleUpdate(updated: Item) {
+    setItems(prev => prev.map(i => i.id === updated.id ? updated : i))
+  }
+
   const selected = new Date(selectedDate + 'T12:00:00')
   const week = Array.from({ length: 7 }, (_, i) => addDays(selected, i - 3))
   const dayItems = items.filter(i => i.date === selectedDate && i.type === 'appointment')
@@ -104,7 +108,7 @@ export default function AgendaPage() {
         ) : (
           <div className="space-y-2">
             {dayItems.map(i => (
-              <ItemCard key={i.id} item={i} onComplete={handleComplete} onDelete={handleDelete} onUpdateReminder={handleUpdateReminder} />
+              <ItemCard key={i.id} item={i} onComplete={handleComplete} onDelete={handleDelete} onUpdateReminder={handleUpdateReminder} onUpdate={handleUpdate} />
             ))}
           </div>
         )}

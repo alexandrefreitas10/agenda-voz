@@ -97,6 +97,10 @@ export default function HomePage() {
     setItems(prev => prev.map(i => i.id === id ? updated : i))
   }
 
+  function handleUpdate(updated: Item) {
+    setItems(prev => prev.map(i => i.id === updated.id ? updated : i))
+  }
+
   const today = todayStr()
   const todayItems = items.filter(i => i.date === today).sort((a, b) => (a.time ?? '').localeCompare(b.time ?? ''))
   const upcomingItems = items.filter(i => i.date && i.date > today).sort((a, b) => a.date!.localeCompare(b.date!))
@@ -140,7 +144,7 @@ export default function HomePage() {
           ) : (
             <div className="space-y-2">
               {todayItems.map(i => (
-                <ItemCard key={i.id} item={i} onComplete={handleComplete} onDelete={handleDelete} onUpdateReminder={handleUpdateReminder} />
+                <ItemCard key={i.id} item={i} onComplete={handleComplete} onDelete={handleDelete} onUpdateReminder={handleUpdateReminder} onUpdate={handleUpdate} />
               ))}
             </div>
           )}
@@ -152,7 +156,7 @@ export default function HomePage() {
             <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-3">Próximos</h2>
             <div className="space-y-2">
               {upcomingItems.slice(0, 3).map(i => (
-                <ItemCard key={i.id} item={i} onComplete={handleComplete} onDelete={handleDelete} onUpdateReminder={handleUpdateReminder} />
+                <ItemCard key={i.id} item={i} onComplete={handleComplete} onDelete={handleDelete} onUpdateReminder={handleUpdateReminder} onUpdate={handleUpdate} />
               ))}
               {upcomingItems.length > 3 && (
                 <Link href="/agenda" className="block text-center text-xs text-zinc-500 hover:text-zinc-300 py-2">
@@ -169,7 +173,7 @@ export default function HomePage() {
             <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-3">Tarefas pendentes</h2>
             <div className="space-y-2">
               {tasks.slice(0, 5).map(i => (
-                <ItemCard key={i.id} item={i} onComplete={handleComplete} onDelete={handleDelete} onUpdateReminder={handleUpdateReminder} />
+                <ItemCard key={i.id} item={i} onComplete={handleComplete} onDelete={handleDelete} onUpdateReminder={handleUpdateReminder} onUpdate={handleUpdate} />
               ))}
               {tasks.length > 5 && (
                 <Link href="/tarefas" className="block text-center text-xs text-zinc-500 hover:text-zinc-300 py-2">
