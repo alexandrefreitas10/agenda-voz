@@ -6,10 +6,14 @@ import { sendPush } from '@/lib/push'
 export async function GET(req: NextRequest) {
   const secret = req.headers.get('x-cron-secret')
   if (secret !== process.env.CRON_SECRET) {
+    console.error('CRON_SECRET inválido:', { received: secret, expected: process.env.CRON_SECRET ? '***' : 'undefined' })
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   await initSchema()
+
+  const now = new Date()
+  console.log('CRON started:', now.toISOString())
 
   const due = await sql`
     SELECT * FROM items
@@ -20,7 +24,11 @@ export async function GET(req: NextRequest) {
       AND completed = false
   `
 
-  if (due.length === 0) return NextResponse.json({ sent: 0 })
+  console.log('Due items found:', due.length)
+  if (due.length === 0) {
+    console.log('No reminders due')
+    return NextResponse.json({ sent: 0 })
+  }
 
   const subscriptions = await sql`SELECT * FROM push_subscriptions`
 

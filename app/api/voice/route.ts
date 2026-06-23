@@ -13,20 +13,18 @@ export async function POST(req: NextRequest) {
     const buffer = Buffer.from(await file.arrayBuffer())
     const transcription = await transcribeAudio(buffer, file.name || 'audio.webm')
     const parsed = await parseTranscription(transcription)
+    console.log('Parsed:', parsed)
 
     let reminderAt: string | null = null
-    if (parsed.type === 'appointment' && parsed.date && parsed.reminder_minutes != null) {
+    if (parsed.reminder_minutes != null && parsed.date) {
       const dateTime = parsed.time
         ? new Date(`${parsed.date}T${parsed.time}:00`)
         : new Date(`${parsed.date}T09:00:00`)
       dateTime.setMinutes(dateTime.getMinutes() - parsed.reminder_minutes)
       reminderAt = dateTime.toISOString()
-    } else if (parsed.type === 'task' && parsed.reminder_minutes != null && parsed.date) {
-      const dateTime = parsed.time
-        ? new Date(`${parsed.date}T${parsed.time}:00`)
-        : new Date(`${parsed.date}T09:00:00`)
-      dateTime.setMinutes(dateTime.getMinutes() - parsed.reminder_minutes)
-      reminderAt = dateTime.toISOString()
+      console.log('✓ Reminder set:', { date: parsed.date, time: parsed.time, reminder_minutes: parsed.reminder_minutes, reminderAt })
+    } else {
+      console.log('✗ No reminder:', { date: parsed.date, reminder_minutes: parsed.reminder_minutes, type: parsed.type })
     }
 
     const [item] = await sql`
