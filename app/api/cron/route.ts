@@ -4,9 +4,12 @@ import sql, { initSchema } from '@/lib/db'
 import { sendPush } from '@/lib/push'
 
 export async function GET(req: NextRequest) {
-  const secret = req.headers.get('x-cron-secret')
-  if (secret !== process.env.CRON_SECRET) {
-    console.error('CRON_SECRET inválido:', { received: secret, expected: process.env.CRON_SECRET ? '***' : 'undefined' })
+  const headerSecret = req.headers.get('x-cron-secret')
+  const urlSecret = req.nextUrl.searchParams.get('secret')
+  const received = headerSecret ?? urlSecret
+
+  if (received !== process.env.CRON_SECRET) {
+    console.error('CRON_SECRET inválido:', { expected: process.env.CRON_SECRET ? '(definido)' : 'undefined' })
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
