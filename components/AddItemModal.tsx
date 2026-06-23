@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import WhatsAppContact from './WhatsAppContact'
 
 interface Item {
   id: number
@@ -11,6 +12,8 @@ interface Item {
   time: string | null
   reminder_at: string | null
   completed: boolean
+  whatsapp_number?: string | null
+  whatsapp_name?: string | null
 }
 
 interface Props {
@@ -25,6 +28,8 @@ export default function AddItemModal({ defaultDate, onClose, onCreated }: Props)
   const [description, setDescription] = useState('')
   const [date, setDate] = useState(defaultDate ?? '')
   const [time, setTime] = useState('')
+  const [whatsappNumber, setWhatsappNumber] = useState<string | null>(null)
+  const [whatsappName, setWhatsappName] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
@@ -41,6 +46,8 @@ export default function AddItemModal({ defaultDate, onClose, onCreated }: Props)
         description: description.trim(),
         date: date || null,
         time: time || null,
+        whatsapp_number: whatsappNumber,
+        whatsapp_name: whatsappName,
       }),
     })
     const item = await res.json()
@@ -122,6 +129,16 @@ export default function AddItemModal({ defaultDate, onClose, onCreated }: Props)
             />
           </div>
         </div>
+
+        {/* WhatsApp */}
+        <WhatsAppContact
+          number={whatsappNumber}
+          name={whatsappName}
+          onUpdate={setWhatsappNumber && setWhatsappName ? (num, name) => {
+            setWhatsappNumber(num)
+            setWhatsappName(name)
+          } : () => {}}
+        />
 
         <button
           onClick={handleSave}
