@@ -117,6 +117,19 @@ export default function HomePage() {
     setItems(prev => [item, ...prev])
   }
 
+  async function testReminders() {
+    console.log('Testing reminders...')
+    try {
+      const res = await fetch('/api/cron')
+      const data = await res.json()
+      console.log('Cron response:', data)
+      alert(`Teste: ${data.sent || 0} notificações enviadas\nVeja o console para detalhes`)
+    } catch (e: any) {
+      console.error('Test error:', e)
+      alert(`Erro: ${e.message}`)
+    }
+  }
+
   const today = todayStr()
   const normalize = (d: string | null) => d ? d.slice(0, 10) : null
   const todayItems = items.filter(i => normalize(i.date) === today).sort((a, b) => (a.time ?? '').localeCompare(b.time ?? ''))
@@ -127,19 +140,28 @@ export default function HomePage() {
     <div className="min-h-screen pb-32">
       {/* Header */}
       <div className="px-4 pt-8 pb-4 flex items-start justify-between">
-        <div>
+        <div className="flex-1">
           <p className="text-zinc-400 text-sm">{formatGreeting()}</p>
           <h1 className="text-2xl font-black text-white">Minha Agenda</h1>
           <p className="text-zinc-500 text-xs mt-0.5">
             {new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })}
           </p>
         </div>
-        <button
-          onClick={() => setShowAdd(true)}
-          className="mt-2 flex items-center gap-1.5 px-3 py-2 bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold rounded-xl transition-colors"
-        >
-          + Adicionar
-        </button>
+        <div className="flex gap-2 mt-2">
+          <button
+            onClick={testReminders}
+            className="px-2 py-2 bg-blue-900/50 hover:bg-blue-900 text-blue-300 text-xs font-bold rounded-xl transition-colors border border-blue-700"
+            title="Testar lembretes"
+          >
+            🧪
+          </button>
+          <button
+            onClick={() => setShowAdd(true)}
+            className="flex items-center gap-1.5 px-3 py-2 bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold rounded-xl transition-colors"
+          >
+            + Adicionar
+          </button>
+        </div>
       </div>
 
       {/* Push notifications banner */}
