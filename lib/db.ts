@@ -19,6 +19,8 @@ export async function initSchema() {
         reminder_at TIMESTAMPTZ,
         reminder_notified BOOLEAN DEFAULT FALSE,
         completed BOOLEAN DEFAULT FALSE,
+        whatsapp_number TEXT,
+        whatsapp_name TEXT,
         created_at TIMESTAMPTZ DEFAULT NOW()
       )
     `
@@ -31,6 +33,14 @@ export async function initSchema() {
         created_at TIMESTAMPTZ DEFAULT NOW()
       )
     `
+
+    // Adicionar colunas se não existirem
+    try {
+      await sql`ALTER TABLE items ADD COLUMN whatsapp_number TEXT`
+    } catch (e) {}
+    try {
+      await sql`ALTER TABLE items ADD COLUMN whatsapp_name TEXT`
+    } catch (e) {}
   } catch (e) {
     console.error('initSchema error:', e)
   }

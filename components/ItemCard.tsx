@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import WhatsAppContact from './WhatsAppContact'
 
 interface Item {
   id: number
@@ -11,6 +12,8 @@ interface Item {
   time: string | null
   reminder_at: string | null
   completed: boolean
+  whatsapp_number?: string | null
+  whatsapp_name?: string | null
 }
 
 interface Props {
@@ -208,6 +211,20 @@ export default function ItemCard({ item, onComplete, onDelete, onUpdateReminder,
               />
             </div>
           </div>
+
+          <WhatsAppContact
+            number={item.whatsapp_number || null}
+            name={item.whatsapp_name || null}
+            onUpdate={async (number, name) => {
+              const res = await fetch(`/api/items/${item.id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ whatsapp_number: number, whatsapp_name: name }),
+              })
+              const updated = await res.json()
+              onUpdate(updated)
+            }}
+          />
 
           <div className="flex gap-2 pt-1">
             <button

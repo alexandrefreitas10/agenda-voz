@@ -11,8 +11,8 @@ export async function POST(req: NextRequest) {
   await initSchema()
   const body = await req.json()
   const [item] = await sql`
-    INSERT INTO items (type, title, description, date, time, reminder_at)
-    VALUES (${body.type}, ${body.title}, ${body.description ?? ''}, ${body.date ?? null}, ${body.time ?? null}, ${body.reminder_at ?? null})
+    INSERT INTO items (type, title, description, date, time, reminder_at, whatsapp_number, whatsapp_name)
+    VALUES (${body.type}, ${body.title}, ${body.description ?? ''}, ${body.date ?? null}, ${body.time ?? null}, ${body.reminder_at ?? null}, ${body.whatsapp_number ?? null}, ${body.whatsapp_name ?? null})
     RETURNING *
   `
   return NextResponse.json(item, { status: 201 })

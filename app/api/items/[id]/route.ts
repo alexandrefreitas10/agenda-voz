@@ -22,6 +22,9 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   if ('date' in body || 'time' in body) {
     await sql`UPDATE items SET date = ${body.date ?? null}, time = ${body.time ?? null} WHERE id = ${id}`
   }
+  if ('whatsapp_number' in body || 'whatsapp_name' in body) {
+    await sql`UPDATE items SET whatsapp_number = ${body.whatsapp_number ?? null}, whatsapp_name = ${body.whatsapp_name ?? null} WHERE id = ${id}`
+  }
 
   const [item] = await sql`SELECT * FROM items WHERE id = ${id}`
   return NextResponse.json(item)
