@@ -18,7 +18,18 @@ export default function MicButton({ onResult }: Props) {
     setErrorMsg('')
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      const mr = new MediaRecorder(stream)
+
+      // Tentar encontrar um mimeType compatível
+      const mimeTypes = ['audio/webm;codecs=opus', 'audio/ogg;codecs=opus', 'audio/webm', 'audio/ogg']
+      let selectedMimeType = 'audio/webm'
+      for (const mime of mimeTypes) {
+        if (MediaRecorder.isTypeSupported(mime)) {
+          selectedMimeType = mime
+          break
+        }
+      }
+
+      const mr = new MediaRecorder(stream, { mimeType: selectedMimeType })
       mediaRecorderRef.current = mr
       chunksRef.current = []
 
@@ -26,9 +37,11 @@ export default function MicButton({ onResult }: Props) {
       mr.onstop = async () => {
         stream.getTracks().forEach(t => t.stop())
         setState('processing')
-        const blob = new Blob(chunksRef.current, { type: 'audio/webm' })
+        const blob = new Blob(chunksRef.current, { type: selectedMimeType })
         const fd = new FormData()
-        fd.append('audio', blob, 'audio.webm')
+        const filename = selectedMimeType.includes('ogg') ? 'audio.ogg' : 'audio.webm'
+        fd.append('audio', blob, filename)
+        console.log('Recording:', { mimeType: selectedMimeType, size: blob.size, filename })
         try {
           const res = await fetch('/api/voice', { method: 'POST', body: fd })
           const data = await res.json()
