@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import MicButton from '@/components/MicButton'
 import ItemCard from '@/components/ItemCard'
+import AddItemModal from '@/components/AddItemModal'
 
 interface Item {
   id: number
@@ -33,6 +34,7 @@ export default function HomePage() {
   const [lastTranscription, setLastTranscription] = useState('')
   const [showSuccess, setShowSuccess] = useState(false)
   const [pushEnabled, setPushEnabled] = useState(false)
+  const [showAdd, setShowAdd] = useState(false)
 
   const load = useCallback(async () => {
     const res = await fetch('/api/items')
@@ -101,6 +103,10 @@ export default function HomePage() {
     setItems(prev => prev.map(i => i.id === updated.id ? updated : i))
   }
 
+  function handleCreated(item: Item) {
+    setItems(prev => [item, ...prev])
+  }
+
   const today = todayStr()
   const todayItems = items.filter(i => i.date === today).sort((a, b) => (a.time ?? '').localeCompare(b.time ?? ''))
   const upcomingItems = items.filter(i => i.date && i.date > today).sort((a, b) => a.date!.localeCompare(b.date!))
@@ -109,12 +115,20 @@ export default function HomePage() {
   return (
     <div className="min-h-screen pb-32">
       {/* Header */}
-      <div className="px-4 pt-8 pb-4">
-        <p className="text-zinc-400 text-sm">{formatGreeting()}</p>
-        <h1 className="text-2xl font-black text-white">Minha Agenda</h1>
-        <p className="text-zinc-500 text-xs mt-0.5">
-          {new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })}
-        </p>
+      <div className="px-4 pt-8 pb-4 flex items-start justify-between">
+        <div>
+          <p className="text-zinc-400 text-sm">{formatGreeting()}</p>
+          <h1 className="text-2xl font-black text-white">Minha Agenda</h1>
+          <p className="text-zinc-500 text-xs mt-0.5">
+            {new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })}
+          </p>
+        </div>
+        <button
+          onClick={() => setShowAdd(true)}
+          className="mt-2 flex items-center gap-1.5 px-3 py-2 bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold rounded-xl transition-colors"
+        >
+          + Adicionar
+        </button>
       </div>
 
       {/* Push notifications banner */}
@@ -184,6 +198,14 @@ export default function HomePage() {
           </section>
         )}
       </div>
+
+      {showAdd && (
+        <AddItemModal
+          defaultDate={todayStr()}
+          onClose={() => setShowAdd(false)}
+          onCreated={handleCreated}
+        />
+      )}
 
       {/* Navbar bottom */}
       <nav className="fixed bottom-0 left-0 right-0 bg-zinc-950/90 backdrop-blur-sm border-t border-zinc-800">

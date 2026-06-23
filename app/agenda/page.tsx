@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import ItemCard from '@/components/ItemCard'
+import AddItemModal from '@/components/AddItemModal'
 
 interface Item {
   id: number
@@ -28,6 +29,7 @@ function toDateStr(d: Date) {
 export default function AgendaPage() {
   const [items, setItems] = useState<Item[]>([])
   const [selectedDate, setSelectedDate] = useState(toDateStr(new Date()))
+  const [showAdd, setShowAdd] = useState(false)
 
   const load = useCallback(async () => {
     const res = await fetch('/api/items')
@@ -54,6 +56,10 @@ export default function AgendaPage() {
 
   function handleUpdate(updated: Item) {
     setItems(prev => prev.map(i => i.id === updated.id ? updated : i))
+  }
+
+  function handleCreated(item: Item) {
+    setItems(prev => [...prev, item])
   }
 
   const selected = new Date(selectedDate + 'T12:00:00')
@@ -100,9 +106,17 @@ export default function AgendaPage() {
       </div>
 
       <div className="px-4">
-        <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-3">
-          {new Date(selectedDate + 'T12:00:00').toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })}
-        </p>
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider">
+            {new Date(selectedDate + 'T12:00:00').toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })}
+          </p>
+          <button
+            onClick={() => setShowAdd(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold rounded-xl transition-colors"
+          >
+            + Adicionar
+          </button>
+        </div>
         {dayItems.length === 0 ? (
           <p className="text-zinc-700 text-sm text-center py-12">Nenhum compromisso neste dia.</p>
         ) : (
@@ -113,6 +127,14 @@ export default function AgendaPage() {
           </div>
         )}
       </div>
+
+      {showAdd && (
+        <AddItemModal
+          defaultDate={selectedDate}
+          onClose={() => setShowAdd(false)}
+          onCreated={handleCreated}
+        />
+      )}
 
       <nav className="fixed bottom-0 left-0 right-0 bg-zinc-950/90 backdrop-blur-sm border-t border-zinc-800">
         <div className="max-w-md mx-auto flex items-center justify-around px-6 py-4">
