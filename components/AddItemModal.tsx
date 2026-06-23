@@ -134,10 +134,10 @@ export default function AddItemModal({ defaultDate, onClose, onCreated }: Props)
         <WhatsAppContact
           number={whatsappNumber}
           name={whatsappName}
-          onUpdate={setWhatsappNumber && setWhatsappName ? (num, name) => {
+          onUpdate={(num, name) => {
             setWhatsappNumber(num)
             setWhatsappName(name)
-          } : () => {}}
+          }}
         />
 
         <button
