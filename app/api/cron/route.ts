@@ -3,15 +3,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import sql, { initSchema } from '@/lib/db'
 import { sendPush } from '@/lib/push'
 
-export async function GET(req: NextRequest) {
-  const headerSecret = req.headers.get('x-cron-secret')
-  const urlSecret = req.nextUrl.searchParams.get('secret')
-  const received = headerSecret ?? urlSecret
-
-  if (received !== process.env.CRON_SECRET) {
-    console.error('CRON_SECRET inválido:', { expected: process.env.CRON_SECRET ? '(definido)' : 'undefined' })
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+export async function GET() {
+  // Sem autenticação - pode ser chamado pelo Service Worker
 
   await initSchema()
 

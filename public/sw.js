@@ -19,18 +19,10 @@ self.addEventListener('notificationclick', event => {
 // Verificar lembretes a cada minuto
 setInterval(async () => {
   try {
-    const res = await fetch('/api/reminders/check')
-    const data = await res.json()
-    if (data.reminders && data.reminders.length > 0) {
-      for (const reminder of data.reminders) {
-        self.registration.showNotification(reminder.title, {
-          body: reminder.body,
-          tag: reminder.tag,
-          icon: '/icons/icon-192.png',
-          badge: '/icons/icon-192.png',
-          vibrate: [200, 100, 200],
-        })
-      }
+    const res = await fetch('/api/cron')
+    if (res.ok) {
+      const data = await res.json()
+      console.log(`✓ Checked reminders: ${data.sent || 0} notified`)
     }
   } catch (e) {
     console.error('Error checking reminders:', e)
