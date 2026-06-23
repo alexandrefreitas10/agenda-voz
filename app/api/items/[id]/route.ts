@@ -13,6 +13,9 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   if ('title' in body) {
     await sql`UPDATE items SET title = ${body.title} WHERE id = ${id}`
   }
+  if ('description' in body) {
+    await sql`UPDATE items SET description = ${body.description} WHERE id = ${id}`
+  }
   if ('reminder_at' in body) {
     await sql`UPDATE items SET reminder_at = ${body.reminder_at}, reminder_notified = false WHERE id = ${id}`
   }

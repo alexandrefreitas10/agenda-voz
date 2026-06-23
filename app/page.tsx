@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import MicButton from '@/components/MicButton'
 import ItemCard from '@/components/ItemCard'
@@ -29,6 +30,7 @@ function formatGreeting() {
 }
 
 export default function HomePage() {
+  const router = useRouter()
   const [items, setItems] = useState<Item[]>([])
   const [loading, setLoading] = useState(true)
   const [lastTranscription, setLastTranscription] = useState('')
@@ -73,6 +75,10 @@ export default function HomePage() {
     setLastTranscription(transcription)
     setShowSuccess(true)
     setTimeout(() => setShowSuccess(false), 4000)
+    if (item.date) {
+      const dateStr = item.date.slice(0, 10)
+      setTimeout(() => router.push(`/agenda?date=${dateStr}`), 1500)
+    }
   }
 
   async function handleComplete(id: number) {
@@ -108,8 +114,9 @@ export default function HomePage() {
   }
 
   const today = todayStr()
-  const todayItems = items.filter(i => i.date === today).sort((a, b) => (a.time ?? '').localeCompare(b.time ?? ''))
-  const upcomingItems = items.filter(i => i.date && i.date > today).sort((a, b) => a.date!.localeCompare(b.date!))
+  const normalize = (d: string | null) => d ? d.slice(0, 10) : null
+  const todayItems = items.filter(i => normalize(i.date) === today).sort((a, b) => (a.time ?? '').localeCompare(b.time ?? ''))
+  const upcomingItems = items.filter(i => { const d = normalize(i.date); return d && d > today }).sort((a, b) => normalize(a.date)!.localeCompare(normalize(b.date)!))
   const tasks = items.filter(i => !i.date)
 
   return (

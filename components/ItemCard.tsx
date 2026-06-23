@@ -21,9 +21,15 @@ interface Props {
   onUpdate: (item: Item) => void
 }
 
-function formatDate(d: string | null) {
+function normalizeDate(d: string | null) {
   if (!d) return null
-  return new Date(d + 'T12:00:00').toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' })
+  return d.slice(0, 10)
+}
+
+function formatDate(d: string | null) {
+  const ds = normalizeDate(d)
+  if (!ds) return null
+  return new Date(ds + 'T12:00:00').toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' })
 }
 
 function formatTime(t: string | null) {
@@ -43,7 +49,7 @@ export default function ItemCard({ item, onComplete, onDelete, onUpdateReminder,
 
   const [editTitle, setEditTitle] = useState(item.title)
   const [editDescription, setEditDescription] = useState(item.description)
-  const [editDate, setEditDate] = useState(item.date ?? '')
+  const [editDate, setEditDate] = useState(item.date ? item.date.slice(0, 10) : '')
   const [editTime, setEditTime] = useState(item.time ? item.time.slice(0, 5) : '')
 
   const [reminderDate, setReminderDate] = useState(
@@ -53,7 +59,7 @@ export default function ItemCard({ item, onComplete, onDelete, onUpdateReminder,
   function openEdit() {
     setEditTitle(item.title)
     setEditDescription(item.description)
-    setEditDate(item.date ?? '')
+    setEditDate(item.date ? item.date.slice(0, 10) : '')
     setEditTime(item.time ? item.time.slice(0, 5) : '')
     setShowEdit(true)
     setShowReminder(false)

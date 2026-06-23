@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import ItemCard from '@/components/ItemCard'
 import AddItemModal from '@/components/AddItemModal'
@@ -26,9 +27,10 @@ function toDateStr(d: Date) {
   return d.toISOString().split('T')[0]
 }
 
-export default function AgendaPage() {
+function AgendaContent() {
+  const searchParams = useSearchParams()
   const [items, setItems] = useState<Item[]>([])
-  const [selectedDate, setSelectedDate] = useState(toDateStr(new Date()))
+  const [selectedDate, setSelectedDate] = useState(searchParams.get('date') ?? toDateStr(new Date()))
   const [showAdd, setShowAdd] = useState(false)
 
   const load = useCallback(async () => {
@@ -64,7 +66,7 @@ export default function AgendaPage() {
 
   const selected = new Date(selectedDate + 'T12:00:00')
   const week = Array.from({ length: 7 }, (_, i) => addDays(selected, i - 3))
-  const dayItems = items.filter(i => i.date === selectedDate && i.type === 'appointment')
+  const dayItems = items.filter(i => i.date && i.date.slice(0, 10) === selectedDate && i.type === 'appointment')
     .sort((a, b) => (a.time ?? '').localeCompare(b.time ?? ''))
 
   return (
@@ -149,5 +151,13 @@ export default function AgendaPage() {
         </div>
       </nav>
     </div>
+  )
+}
+
+export default function AgendaPage() {
+  return (
+    <Suspense fallback={null}>
+      <AgendaContent />
+    </Suspense>
   )
 }
