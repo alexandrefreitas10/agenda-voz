@@ -28,6 +28,45 @@ export async function transcribeAudio(audioBuffer: Buffer, filename: string): Pr
   return result.text
 }
 
+export interface ParsedTaskList {
+  date: string // YYYY-MM-DD
+  tasks: { time: string | null; title: string }[]
+}
+
+export async function parseTaskList(text: string): Promise<ParsedTaskList> {
+  const today = TODAY()
+  const nowIso = NOW_ISO()
+
+  const response = await getClient().chat.completions.create({
+    model: 'gpt-4o-mini',
+    response_format: { type: 'json_object' },
+    messages: [
+      {
+        role: 'system',
+        content: `Você é um assistente pessoal. Hoje é ${today} (${nowIso}).
+O usuário vai ditar uma lista de atividades para um dia específico, com horários.
+Extraia a data mencionada (segunda, terça, amanhã, etc.) e a lista de tarefas com horários.
+
+Retorne APENAS um JSON com:
+- date: data no formato YYYY-MM-DD (se não mencionado, use amanhã: ${new Date(Date.now() + 86400000).toISOString().split('T')[0]})
+- tasks: array de objetos com:
+  - time: horário no formato HH:MM (null se não mencionado)
+  - title: nome curto e claro da atividade
+
+Exemplo: "Segunda, 7h Aula de Tênis. 8h Café da manhã. 9h Cortar o cabelo."
+→ { "date": "2026-06-29", "tasks": [{"time":"07:00","title":"Aula de Tênis"},{"time":"08:00","title":"Café da manhã"},{"time":"09:00","title":"Cortar o cabelo"}] }`,
+      },
+      { role: 'user', content: text },
+    ],
+  })
+
+  const raw = JSON.parse(response.choices[0].message.content ?? '{}')
+  return {
+    date: raw.date ?? new Date(Date.now() + 86400000).toISOString().split('T')[0],
+    tasks: Array.isArray(raw.tasks) ? raw.tasks.map((t: any) => ({ time: t.time ?? null, title: String(t.title ?? '') })) : [],
+  }
+}
+
 export async function parseTranscription(text: string): Promise<ParsedItem> {
   const today = TODAY()
   const nowIso = NOW_ISO()

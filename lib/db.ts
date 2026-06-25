@@ -57,6 +57,33 @@ export async function initSchema() {
     `
     try { await sql`ALTER TABLE expenses ADD COLUMN category TEXT DEFAULT ''` } catch (e) {}
     try { await sql`ALTER TABLE expenses ADD COLUMN notes TEXT DEFAULT ''` } catch (e) {}
+
+    await sql`
+      CREATE TABLE IF NOT EXISTS daily_tasks (
+        id SERIAL PRIMARY KEY,
+        date DATE NOT NULL,
+        time TEXT,
+        title TEXT NOT NULL,
+        completed BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `
+
+    await sql`
+      CREATE TABLE IF NOT EXISTS commitments (
+        id SERIAL PRIMARY KEY,
+        title TEXT NOT NULL,
+        description TEXT DEFAULT '',
+        scheduled_time TEXT,
+        location TEXT DEFAULT '',
+        deadline DATE,
+        is_open BOOLEAN DEFAULT TRUE,
+        urgency TEXT NOT NULL DEFAULT 'low' CHECK (urgency IN ('low', 'medium', 'high')),
+        priority INTEGER NOT NULL DEFAULT 1 CHECK (priority BETWEEN 1 AND 5),
+        completed BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `
   } catch (e) {
     console.error('initSchema error:', e)
   }
