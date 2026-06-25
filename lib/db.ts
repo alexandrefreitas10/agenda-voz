@@ -43,7 +43,7 @@ export async function initSchema() {
         id SERIAL PRIMARY KEY,
         month TEXT NOT NULL,
         name TEXT NOT NULL,
-        category TEXT DEFAULT '',
+        due_day INTEGER,
         type TEXT NOT NULL DEFAULT 'recurring' CHECK (type IN ('recurring', 'installment', 'single')),
         installment_current INTEGER,
         installment_total INTEGER,
@@ -55,7 +55,7 @@ export async function initSchema() {
         created_at TIMESTAMPTZ DEFAULT NOW()
       )
     `
-    try { await sql`ALTER TABLE expenses ADD COLUMN category TEXT DEFAULT ''` } catch (e) {}
+    try { await sql`ALTER TABLE expenses ADD COLUMN due_day INTEGER` } catch (e) {}
     try { await sql`ALTER TABLE expenses ADD COLUMN notes TEXT DEFAULT ''` } catch (e) {}
 
     await sql`

@@ -10,7 +10,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   if ('status' in body) await sql`UPDATE expenses SET status = ${body.status} WHERE id = ${id}`
   if ('amount' in body) await sql`UPDATE expenses SET amount = ${body.amount} WHERE id = ${id}`
   if ('name' in body) await sql`UPDATE expenses SET name = ${body.name} WHERE id = ${id}`
-  if ('category' in body) await sql`UPDATE expenses SET category = ${body.category} WHERE id = ${id}`
+  if ('due_day' in body) await sql`UPDATE expenses SET due_day = ${body.due_day} WHERE id = ${id}`
   if ('auto_debit' in body) await sql`UPDATE expenses SET auto_debit = ${body.auto_debit} WHERE id = ${id}`
   if ('owner' in body) await sql`UPDATE expenses SET owner = ${body.owner} WHERE id = ${id}`
   if ('notes' in body) await sql`UPDATE expenses SET notes = ${body.notes} WHERE id = ${id}`

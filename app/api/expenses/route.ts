@@ -13,11 +13,11 @@ export async function POST(req: NextRequest) {
   await initSchema()
   const body = await req.json()
   const [expense] = await sql`
-    INSERT INTO expenses (month, name, category, type, installment_current, installment_total, amount, owner, auto_debit, status, notes)
+    INSERT INTO expenses (month, name, due_day, type, installment_current, installment_total, amount, owner, auto_debit, status, notes)
     VALUES (
       ${body.month},
       ${body.name},
-      ${body.category ?? ''},
+      ${body.due_day ?? null},
       ${body.type ?? 'recurring'},
       ${body.installment_current ?? null},
       ${body.installment_total ?? null},

@@ -17,11 +17,11 @@ export async function POST(req: NextRequest) {
     if (e.type === 'installment' && nextInstallment != null && e.installment_total != null && nextInstallment > e.installment_total) continue
 
     const [newExpense] = await sql`
-      INSERT INTO expenses (month, name, category, type, installment_current, installment_total, amount, owner, auto_debit, status, notes)
+      INSERT INTO expenses (month, name, due_day, type, installment_current, installment_total, amount, owner, auto_debit, status, notes)
       VALUES (
         ${toMonth},
         ${e.name},
-        ${e.category ?? ''},
+        ${e.due_day ?? null},
         ${e.type},
         ${nextInstallment},
         ${e.installment_total ?? null},

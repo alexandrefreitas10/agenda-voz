@@ -7,7 +7,7 @@ interface Expense {
   id: number
   month: string
   name: string
-  category: string
+  due_day: number | null
   type: 'recurring' | 'installment' | 'single'
   installment_current: number | null
   installment_total: number | null
@@ -48,14 +48,14 @@ function formatAmount(v: string | number) {
 }
 
 type FormType = {
-  name: string; category: string; type: 'recurring' | 'installment' | 'single';
+  name: string; due_day: string; type: 'recurring' | 'installment' | 'single';
   installment_current: string; installment_total: string;
   amount: string; owner: 'mine' | 'wife' | 'shared'; auto_debit: boolean;
   status: 'paid' | 'unpaid'; notes: string;
 }
 
 const emptyForm: FormType = {
-  name: '', category: '', type: 'recurring',
+  name: '', due_day: '', type: 'recurring',
   installment_current: '', installment_total: '',
   amount: '', owner: 'mine', auto_debit: false, status: 'unpaid', notes: ''
 }
@@ -83,7 +83,7 @@ export default function FinancasPage() {
     const body = {
       month,
       name: form.name.trim(),
-      category: form.category.trim(),
+      due_day: form.due_day ? Number(form.due_day) : null,
       type: form.type,
       installment_current: form.installment_current ? Number(form.installment_current) : null,
       installment_total: form.installment_total ? Number(form.installment_total) : null,
@@ -111,7 +111,7 @@ export default function FinancasPage() {
 
   function openEdit(e: Expense) {
     setForm({
-      name: e.name, category: e.category, type: e.type,
+      name: e.name, due_day: e.due_day?.toString() ?? '', type: e.type,
       installment_current: e.installment_current?.toString() ?? '',
       installment_total: e.installment_total?.toString() ?? '',
       amount: Number(e.amount).toFixed(2).replace('.', ','),
@@ -244,7 +244,11 @@ export default function FinancasPage() {
                       <span className="text-xs bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded-full">👫 Compartilhado</span>
                     )}
                   </div>
-                  {e.category && <p className="text-zinc-500 text-xs mt-0.5">{e.category}</p>}
+                  {e.due_day && (
+                    <p className="text-zinc-500 text-xs mt-0.5">
+                      {e.auto_debit ? `🤖 Débito dia ${e.due_day}` : `📅 Vence dia ${e.due_day}`}
+                    </p>
+                  )}
                   {e.notes && <p className="text-zinc-600 text-xs mt-0.5 italic">{e.notes}</p>}
                   <p className={`text-base font-black mt-1 ${e.status === 'paid' ? 'text-green-500' : 'text-orange-400'}`}>
                     {formatAmount(e.amount)}
@@ -282,20 +286,22 @@ export default function FinancasPage() {
                 className="w-full px-3 py-2.5 bg-zinc-900 border border-zinc-700 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" />
             </div>
 
-            {/* Categoria */}
-            <div>
-              <label className="text-xs text-zinc-500 block mb-1">Categoria</label>
-              <input value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
-                placeholder="Ex: Moradia, Lazer, Saúde..."
-                className="w-full px-3 py-2.5 bg-zinc-900 border border-zinc-700 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" />
-            </div>
-
-            {/* Valor */}
-            <div>
-              <label className="text-xs text-zinc-500 block mb-1">Valor (R$)</label>
-              <input value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))}
-                placeholder="0,00" inputMode="decimal"
-                className="w-full px-3 py-2.5 bg-zinc-900 border border-zinc-700 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" />
+            {/* Valor + Dia */}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs text-zinc-500 block mb-1">Valor (R$)</label>
+                <input value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))}
+                  placeholder="0,00" inputMode="decimal"
+                  className="w-full px-3 py-2.5 bg-zinc-900 border border-zinc-700 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" />
+              </div>
+              <div>
+                <label className="text-xs text-zinc-500 block mb-1">
+                  {form.auto_debit ? 'Dia do débito' : 'Dia do vencimento'}
+                </label>
+                <input value={form.due_day} onChange={e => setForm(f => ({ ...f, due_day: e.target.value }))}
+                  placeholder="Ex: 10" inputMode="numeric" maxLength={2}
+                  className="w-full px-3 py-2.5 bg-zinc-900 border border-zinc-700 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" />
+              </div>
             </div>
 
             {/* Tipo */}
